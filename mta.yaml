@@ -1,0 +1,75 @@
+_schema-version: 3.3.0
+ID: devops-hana-academy
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
+modules:
+  - name: devops-hana-academy-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      instances: 1
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: devops-hana-academy-auth
+      - name: devops-hana-academy-db
+      - name: devops-hana-academy-destination
+
+  - name: devops-hana-academy-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: devops-hana-academy-db
+  - name: notification-content-deployment
+    type: nodejs
+    path: gen/srv
+    parameters:
+      no-route: true
+      no-start: true
+      memory: 256MB
+      disk-quota: 1GB
+      tasks:
+        - name: notification-content-deployment
+          command: "node node_modules/@cap-js/notifications/lib/content-deployment.js"
+          memory: 256MB
+          disk-quota: 1GB
+    requires:
+      - name: devops-hana-academy-destination
+      - name: devops-hana-academy-db
+      - name: devops-hana-academy-auth
+
+resources:
+  - name: devops-hana-academy-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: devops-hana-academy-${org}-${space}
+        tenant-mode: dedicated
+  - name: devops-hana-academy-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: devops-hana-academy-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
