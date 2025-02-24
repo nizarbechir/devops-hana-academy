@@ -27,7 +27,9 @@
   "cds": {
     "requires": {
       "auth": "xsuaa",
-      "destinations": true
+      "destinations": true,
+      "html5-repo": true,
+      "connectivity": true
     },
     "sql": {
       "native_hana_associations": false
