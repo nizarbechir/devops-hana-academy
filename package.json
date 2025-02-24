@@ -26,7 +26,7 @@
   ],
   "cds": {
     "requires": {
-      "auth": "xsuaa",
+      "auth": "dummy",
       "destinations": true
     },
     "sql": {
