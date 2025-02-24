@@ -6,11 +6,11 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@cap-js/hana": "^1.6.1",
+    "@cap-js/notifications": "*",
     "@sap/cds": "^8",
-    "express": "^4",
     "@sap/xssec": "^4",
-    "@cap-js/hana": "^1",
-    "@cap-js/notifications": "*"
+    "express": "^4"
   },
   "devDependencies": {
     "@cap-js/cds-types": "^0.9.0",
@@ -26,7 +26,7 @@
   ],
   "cds": {
     "requires": {
-      "auth": "dummy",
+      "auth": "xsuaa",
       "destinations": true
     },
     "sql": {
